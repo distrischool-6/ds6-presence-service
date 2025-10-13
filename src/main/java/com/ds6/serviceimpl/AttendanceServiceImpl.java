@@ -1,21 +1,20 @@
 package com.ds6.serviceimpl;
 
-import com.ds6.dto.AttendanceDTO;
-import com.ds6.dto.CreateAttendanceDTO;
-import com.ds6.model.Attendance;
-import com.ds6.repository.AttendanceRepository;
-
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.ds6.dto.AttendanceDTO;
+import com.ds6.dto.CreateAttendanceDTO;
+import com.ds6.model.Attendance;
+import com.ds6.repository.AttendanceRepository;
 import com.ds6.service.AttendanceService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +26,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Transactional
     public AttendanceDTO createAttendance(CreateAttendanceDTO dto) {
         Attendance attendance = new Attendance();
-        attendance.setId(UUID.randomUUID());
         attendance.setStudentId(dto.studentId());
         attendance.setClassId(dto.classId());
         attendance.setDate(dto.date());
