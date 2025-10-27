@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +18,13 @@ import com.ds6.service.AttendanceService;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Override
     @Transactional
@@ -32,6 +36,17 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendance.setStatus(dto.status());
 
         Attendance savedAttendance = attendanceRepository.save(attendance);
+
+        try {
+            String topic = "attendance.recorded";
+            String payload = savedAttendance.getId().toString();
+
+            kafkaTemplate.send(topic, payload);
+            log.info("Event 'attendance.recorded' published for attendance ID: {}", payload);
+        } catch (Exception e) {
+            log.error("Failed to publish 'attendance.recorded' event for attendance ID: {}. Error: {}", savedAttendance.getId(), e.getMessage());
+        }
+
         return toDTO(savedAttendance);
     }
 
